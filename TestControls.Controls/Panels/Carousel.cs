@@ -85,6 +85,7 @@ namespace TestControls.Controls.Panels
                 Children[i].Arrange(childrenLocations[i]);
                 Children[i].Projection = childrenProjections[i];
                 Children[i].Opacity = childrenOpacity[i];
+                Canvas.SetZIndex(Children[i], (int)childrenProjections[i].LocalOffsetZ);
             }
 
             return finalSize;
