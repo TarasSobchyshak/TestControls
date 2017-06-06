@@ -1,0 +1,47 @@
+﻿<UserControl
+    x:Name="Root"
+    x:Class="TestControls.Controls.Views.Controls.CarouselControl"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:local="using:TestControls.Controls.Views.Controls"
+    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    xmlns:panels="using:TestControls.Controls.Panels"
+    mc:Ignorable="d"
+    d:DesignHeight="300"
+    d:DesignWidth="400">
+
+    <Grid>
+        <Grid VerticalAlignment="Stretch"
+              HorizontalAlignment="Stretch">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="Auto"/>
+                <ColumnDefinition Width="*"/>
+                <ColumnDefinition Width="Auto"/>
+            </Grid.ColumnDefinitions>
+
+            <Button Content="Left" Tapped="LeftButton_Tapped" Grid.Column="0"/>
+
+            <ItemsControl x:Name="ItemsControl" Grid.Column="1" ItemsSource="{Binding ElementName=Root, Path=ItemsSource, Mode=TwoWay}">
+                <ItemsControl.ItemsPanel>
+                    <ItemsPanelTemplate>
+                        <panels:Carousel Tapped="Carousel_Tapped" 
+                                         Offset="200"
+                                         EllipseWidth="700"
+                                         EllipseHeight="200" />
+                    </ItemsPanelTemplate>
+                </ItemsControl.ItemsPanel>
+                <ItemsControl.ItemTemplate>
+                    <DataTemplate>
+                        <Grid Height="300" Width="450" Background="Gray">
+                            <Border BorderBrush="Red" BorderThickness="2"/>
+                            <TextBlock Text="{Binding}"/>
+                        </Grid>
+                    </DataTemplate>
+                </ItemsControl.ItemTemplate>
+            </ItemsControl>
+
+            <Button Content="Right" Tapped="RightButton_Tapped" Grid.Column="2"/>
+        </Grid>
+    </Grid>
+</UserControl>
