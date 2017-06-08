@@ -26,14 +26,15 @@
                 <ItemsControl.ItemsPanel>
                     <ItemsPanelTemplate>
                         <panels:Carousel Tapped="Carousel_Tapped" 
-                                         Offset="200"
-                                         EllipseWidth="700"
+                                         Background="LightGray"
+                                         Offset="40"
+                                         EllipseWidth="800"
                                          EllipseHeight="200" />
                     </ItemsPanelTemplate>
                 </ItemsControl.ItemsPanel>
                 <ItemsControl.ItemTemplate>
                     <DataTemplate>
-                        <Grid Height="300" Width="450" Background="Gray">
+                        <Grid Height="50" Width="100" Background="Gray">
                             <Border BorderBrush="Red" BorderThickness="2"/>
                             <TextBlock Text="{Binding}"/>
                         </Grid>

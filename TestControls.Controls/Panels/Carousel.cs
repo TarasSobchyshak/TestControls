@@ -1,8 +1,12 @@
-﻿using System.Linq;
+﻿using System;
+using System.Linq;
+using System.Threading.Tasks;
 using Windows.Foundation;
 using Windows.UI.Xaml;
 using Windows.UI.Xaml.Controls;
 using Windows.UI.Xaml.Media;
+using Windows.UI.Xaml.Media.Animation;
+using Windows.UI.Xaml.Shapes;
 using static System.Math;
 
 namespace TestControls.Controls.Panels
@@ -12,12 +16,23 @@ namespace TestControls.Controls.Panels
     {
         #region Fields
 
+        private Storyboard _storyboard;
+        private Storyboard[] _storyboards;
         private double _maxWidth;
         private double _maxHeight;
+
+        private double _ellipseMajorAxis;
+        private double _ellipseMinorAxis;
+
         private Rect[] childrenLocations;
         private PlaneProjection[] childrenProjections;
         private double[] childrenOpacity;
+        private Rect[] prevChildrenLocations;
+        private PlaneProjection[] prevChildrenProjections;
+        private double[] prevChildrenOpacity;
 
+        private static Duration rorateToItemDuration = new Duration(new System.TimeSpan(0, 0, 0, 0, 200));
+        private static Duration rorateDuration = new Duration(new System.TimeSpan(0, 0, 0, 0, 400));
         #endregion
 
         #region Properties
@@ -73,6 +88,15 @@ namespace TestControls.Controls.Panels
 
         #endregion
 
+        #region Constructors
+
+        public Carousel()
+        {
+            _storyboard = new Storyboard();
+        }
+
+        #endregion
+
         #region Overridden
 
         protected override Size ArrangeOverride(Size finalSize)
@@ -82,9 +106,9 @@ namespace TestControls.Controls.Panels
             var n = childrenLocations.Length;
             for (int i = 0; i < n; ++i)
             {
-                Children[i].Arrange(childrenLocations[i]);
-                Children[i].Projection = childrenProjections[i];
                 Children[i].Opacity = childrenOpacity[i];
+                Children[i].Projection = childrenProjections[i];
+                Children[i].Arrange(childrenLocations[i]);
                 Canvas.SetZIndex(Children[i], (int)childrenProjections[i].LocalOffsetZ);
             }
 
@@ -106,11 +130,13 @@ namespace TestControls.Controls.Panels
                     _maxWidth = item.DesiredSize.Width;
             }
 
+            availableSize.Height = EllipseHeight;
+            availableSize.Width = EllipseWidth;
+
             CalculateEllipseLocations(availableSize);
             CalculateChildrenProjections();
             CalculateChildrenOpacity();
 
-            availableSize.Height = EllipseHeight + _maxHeight;
 
             return availableSize;
         }
@@ -122,6 +148,10 @@ namespace TestControls.Controls.Panels
         public void RotateLeft()
         {
             if (!Children.Any()) return;
+
+            prevChildrenProjections = childrenProjections.ToArray();
+            prevChildrenLocations = childrenLocations.ToArray();
+            prevChildrenOpacity = childrenOpacity.ToArray();
 
             var x = childrenLocations[childrenLocations.Length - 1];
             var y = childrenProjections[childrenProjections.Length - 1];
@@ -138,12 +168,18 @@ namespace TestControls.Controls.Panels
             childrenProjections[0] = y;
             childrenOpacity[0] = z;
 
-            ArrangeOverride(DesiredSize);
+            //ArrangeOverride(DesiredSize);
+            Animate(rorateDuration, 10);
         }
+
 
         public void RotateRight()
         {
             if (!Children.Any()) return;
+
+            prevChildrenProjections = childrenProjections.ToArray();
+            prevChildrenLocations = childrenLocations.ToArray();
+            prevChildrenOpacity = childrenOpacity.ToArray();
 
             var x = childrenLocations[0];
             var y = childrenProjections[0];
@@ -156,11 +192,12 @@ namespace TestControls.Controls.Panels
                 childrenOpacity[i] = childrenOpacity[i + 1];
             }
 
-            childrenLocations[childrenProjections.Length - 1] = x;
+            childrenLocations[childrenLocations.Length - 1] = x;
             childrenProjections[childrenProjections.Length - 1] = y;
             childrenOpacity[childrenOpacity.Length - 1] = z;
 
-            ArrangeOverride(DesiredSize);
+            //ArrangeOverride(DesiredSize);
+            Animate(rorateDuration, 10);
         }
 
         public void RotateToItem(object item)
@@ -172,11 +209,16 @@ namespace TestControls.Controls.Panels
 
             var index = children.IndexOf(children.FirstOrDefault(x => (x?.DataContext.Equals(item)).Value));
 
-            OffsetChildrenLocations(index);
-            OffsetChildrenProjections(index);
-            OffsetChildrenOpacity(index);
+            prevChildrenProjections = childrenProjections.ToArray();
+            prevChildrenLocations = childrenLocations.ToArray();
+            prevChildrenOpacity = childrenOpacity.ToArray();
 
-            ArrangeOverride(DesiredSize);
+            //OffsetChildrenLocations(index);
+            //OffsetChildrenProjections(index);
+            //OffsetChildrenOpacity(index);
+
+            //ArrangeOverride(DesiredSize);
+            Animate(rorateToItemDuration, 15);
         }
 
         #endregion
@@ -247,18 +289,21 @@ namespace TestControls.Controls.Panels
         {
             var count = Children.Count;
             var itemSize = new Size(_maxWidth, _maxHeight);
-            childrenLocations = new Rect[count];
+
+            _ellipseMajorAxis = EllipseWidth / 2;
+            _ellipseMinorAxis = EllipseHeight / 2;
 
             var top = new Point();
-            var pivot = new Point(EllipseWidth, EllipseHeight);
+            var pivot = new Point(_ellipseMajorAxis, _ellipseMinorAxis);
+            childrenLocations = new Rect[count];
 
             var step = (2 * PI) / count;
             var angle = PI / 2;
 
             for (int i = 0; i < count; ++i)
             {
-                top.X = pivot.X + EllipseWidth * Cos(angle);
-                top.Y = pivot.Y + EllipseHeight * Sin(angle);
+                top.X = pivot.X + _ellipseMajorAxis * Cos(angle);
+                top.Y = pivot.Y + _ellipseMinorAxis * Sin(angle);
 
                 childrenLocations[i] = new Rect(top, itemSize);
                 angle += step;
@@ -312,6 +357,92 @@ namespace TestControls.Controls.Panels
 
                 childrenOpacity[i] = childOpacity;
             }
+        }
+
+        private async void Animate(Duration duration, int count)
+        {
+            if (prevChildrenOpacity == null || prevChildrenProjections == null || prevChildrenLocations == null) return;
+
+            _storyboard.Stop();
+            _storyboard.Children.Clear();
+            count = 5;
+            _storyboards = new Storyboard[count];
+            var translate = new TranslateTransform();
+
+            for (int j = 0; j < count; ++j)
+            {
+                _storyboards[j] = new Storyboard();
+                //_storyboards[j].BeginTime = new TimeSpan(0, 0, 0, 0, duration.TimeSpan.Milliseconds * j);
+
+                prevChildrenProjections = childrenProjections.ToArray();
+                prevChildrenLocations = childrenLocations.ToArray();
+                prevChildrenOpacity = childrenOpacity.ToArray();
+
+                var x0 = childrenLocations[childrenLocations.Length - 1];
+                var y0 = childrenProjections[childrenProjections.Length - 1];
+                var z0 = childrenOpacity[childrenOpacity.Length - 1];
+
+                for (int q = childrenOpacity.Length - 1; q > 0; --q)
+                {
+                    childrenLocations[q] = childrenLocations[q - 1];
+                    childrenProjections[q] = childrenProjections[q - 1];
+                    childrenOpacity[q] = childrenOpacity[q - 1];
+                }
+
+                childrenLocations[0] = x0;
+                childrenProjections[0] = y0;
+                childrenOpacity[0] = z0;
+
+                for (int i = 0; i < Children.Count; ++i)
+                {
+                    var opacityAnimation0 = new DoubleAnimation() { From = prevChildrenOpacity[i], To = childrenOpacity[i], Duration = duration };
+                    Storyboard.SetTarget(opacityAnimation0, Children[i]);
+                    Storyboard.SetTargetProperty(opacityAnimation0, nameof(UIElement.Opacity));
+
+                    var projectionAnimation0 = new DoubleAnimation() { From = prevChildrenProjections[i].LocalOffsetZ, To = childrenProjections[i].LocalOffsetZ, Duration = duration };
+                    Storyboard.SetTarget(projectionAnimation0, Children[i]);
+                    Storyboard.SetTargetProperty(projectionAnimation0, new PropertyPath("UIElement.Projection.LocalOffsetZ").Path);
+
+                    Children[i].RenderTransform = translate;
+
+                    var xAnimation0 = new DoubleAnimation() { From = 0, To = childrenLocations[i].X - prevChildrenLocations[i].X, Duration = duration };
+                    Storyboard.SetTarget(xAnimation0, Children[i]);
+                    Storyboard.SetTargetProperty(xAnimation0, "(UIElement.RenderTransform).(TranslateTransform.X)");
+
+                    var yAnimation0 = new DoubleAnimation() { From = 0, To = childrenLocations[i].Y - prevChildrenLocations[i].Y, Duration = duration };
+                    Storyboard.SetTarget(yAnimation0, Children[i]);
+                    Storyboard.SetTargetProperty(yAnimation0, "(UIElement.RenderTransform).(TranslateTransform.Y)");
+
+                    Canvas.SetZIndex(Children[i], (int)childrenProjections[i].LocalOffsetZ);
+
+                    _storyboards[j].Children.Add(opacityAnimation0);
+                    _storyboards[j].Children.Add(projectionAnimation0);
+                    _storyboards[j].Children.Add(xAnimation0);
+                    _storyboards[j].Children.Add(yAnimation0);
+                    _storyboards[j].Completed += (s, e) =>
+                    {
+                        //var story = s as Storyboard;
+                        //if (story != null)
+                        //{
+                        //    story.Stop();
+                        //    story.Children.Clear();
+                        //    story = null;
+                        //}
+                        ArrangeOverride(DesiredSize);
+                    };
+                }
+            }
+            for (int j = 0; j < count; ++j)
+            {
+                _storyboards[j].Begin();
+                await Task.Delay(duration.TimeSpan.Milliseconds);
+            }
+            //_storyboard.Completed += (s, e) =>
+            //{
+            //    _storyboard.Stop();
+            //    //ArrangeOverride(DesiredSize);
+            //};
+            //_storyboard.Begin();
         }
 
         #endregion
