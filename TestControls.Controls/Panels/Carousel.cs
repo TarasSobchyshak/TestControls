@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using Windows.Foundation;
@@ -31,8 +32,15 @@ namespace TestControls.Controls.Panels
         private PlaneProjection[] prevChildrenProjections;
         private double[] prevChildrenOpacity;
 
-        private static Duration rorateToItemDuration = new Duration(new System.TimeSpan(0, 0, 0, 0, 200));
-        private static Duration rorateDuration = new Duration(new System.TimeSpan(0, 0, 0, 0, 400));
+        private List<Rect[]> childrenLocationsList;
+        private List<PlaneProjection[]> childrenProjectionsList;
+        private List<double[]> childrenOpacityList;
+        private List<Rect[]> prevChildrenLocationsList;
+        private List<PlaneProjection[]> prevChildrenProjectionsList;
+        private List<double[]> prevChildrenOpacityList;
+
+        private static Duration rorateToItemDuration = new Duration(new System.TimeSpan(0, 0, 0, 0, 500));
+        private static Duration rorateDuration = new Duration(new System.TimeSpan(0, 0, 0, 0, 500));
         #endregion
 
         #region Properties
@@ -93,6 +101,12 @@ namespace TestControls.Controls.Panels
         public Carousel()
         {
             _storyboard = new Storyboard();
+            childrenLocationsList = new List<Rect[]>();
+            childrenProjectionsList = new List<PlaneProjection[]>();
+            childrenOpacityList = new List<double[]>();
+            prevChildrenLocationsList = new List<Rect[]>();
+            prevChildrenProjectionsList = new List<PlaneProjection[]>();
+            prevChildrenOpacityList = new List<double[]>();
         }
 
         #endregion
@@ -130,8 +144,8 @@ namespace TestControls.Controls.Panels
                     _maxWidth = item.DesiredSize.Width;
             }
 
-            availableSize.Height = EllipseHeight;
-            availableSize.Width = EllipseWidth;
+            availableSize.Height = EllipseHeight + _maxHeight;
+            availableSize.Width = EllipseWidth + _maxWidth;
 
             CalculateEllipseLocations(availableSize);
             CalculateChildrenProjections();
@@ -149,27 +163,42 @@ namespace TestControls.Controls.Panels
         {
             if (!Children.Any()) return;
 
-            prevChildrenProjections = childrenProjections.ToArray();
-            prevChildrenLocations = childrenLocations.ToArray();
-            prevChildrenOpacity = childrenOpacity.ToArray();
+            childrenLocationsList.Clear();
+            childrenProjectionsList.Clear();
+            childrenOpacityList.Clear();
+            prevChildrenLocationsList.Clear();
+            prevChildrenProjectionsList.Clear();
+            prevChildrenOpacityList.Clear();
 
-            var x = childrenLocations[childrenLocations.Length - 1];
-            var y = childrenProjections[childrenProjections.Length - 1];
-            var z = childrenOpacity[childrenOpacity.Length - 1];
+            //prevChildrenProjections = childrenProjections.ToArray();
+            //prevChildrenLocations = childrenLocations.ToArray();
+            //prevChildrenOpacity = childrenOpacity.ToArray();
 
-            for (int i = childrenOpacity.Length - 1; i > 0; --i)
-            {
-                childrenLocations[i] = childrenLocations[i - 1];
-                childrenProjections[i] = childrenProjections[i - 1];
-                childrenOpacity[i] = childrenOpacity[i - 1];
-            }
+            //prevChildrenProjectionsList.Add(prevChildrenProjections.ToArray());
+            //prevChildrenLocationsList.Add(prevChildrenLocations.ToArray());
+            //prevChildrenOpacityList.Add(prevChildrenOpacity.ToArray());
 
-            childrenLocations[0] = x;
-            childrenProjections[0] = y;
-            childrenOpacity[0] = z;
+            //var x0 = childrenLocations[childrenLocations.Length - 1];
+            //var y0 = childrenProjections[childrenProjections.Length - 1];
+            //var z0 = childrenOpacity[childrenOpacity.Length - 1];
+
+            //for (int q = childrenOpacity.Length - 1; q > 0; --q)
+            //{
+            //    childrenLocations[q] = childrenLocations[q - 1];
+            //    childrenProjections[q] = childrenProjections[q - 1];
+            //    childrenOpacity[q] = childrenOpacity[q - 1];
+            //}
+
+            //childrenLocations[0] = x0;
+            //childrenProjections[0] = y0;
+            //childrenOpacity[0] = z0;
+
+            //childrenProjectionsList.Add(childrenProjections.ToArray());
+            //childrenLocationsList.Add(childrenLocations.ToArray());
+            //childrenOpacityList.Add(childrenOpacity.ToArray());
 
             //ArrangeOverride(DesiredSize);
-            Animate(rorateDuration, 10);
+            Animate(rorateDuration, 1, false);
         }
 
 
@@ -177,27 +206,42 @@ namespace TestControls.Controls.Panels
         {
             if (!Children.Any()) return;
 
-            prevChildrenProjections = childrenProjections.ToArray();
-            prevChildrenLocations = childrenLocations.ToArray();
-            prevChildrenOpacity = childrenOpacity.ToArray();
+            childrenLocationsList.Clear();
+            childrenProjectionsList.Clear();
+            childrenOpacityList.Clear();
+            prevChildrenLocationsList.Clear();
+            prevChildrenProjectionsList.Clear();
+            prevChildrenOpacityList.Clear();
 
-            var x = childrenLocations[0];
-            var y = childrenProjections[0];
-            var z = childrenOpacity[0];
+            //prevChildrenProjections = childrenProjections.ToArray();
+            //prevChildrenLocations = childrenLocations.ToArray();
+            //prevChildrenOpacity = childrenOpacity.ToArray();
 
-            for (int i = 0; i < childrenProjections.Length - 1; ++i)
-            {
-                childrenLocations[i] = childrenLocations[i + 1];
-                childrenProjections[i] = childrenProjections[i + 1];
-                childrenOpacity[i] = childrenOpacity[i + 1];
-            }
+            //prevChildrenProjectionsList.Add(prevChildrenProjections.ToArray());
+            //prevChildrenLocationsList.Add(prevChildrenLocations.ToArray());
+            //prevChildrenOpacityList.Add(prevChildrenOpacity.ToArray());
 
-            childrenLocations[childrenLocations.Length - 1] = x;
-            childrenProjections[childrenProjections.Length - 1] = y;
-            childrenOpacity[childrenOpacity.Length - 1] = z;
+            //var x = childrenLocations[0];
+            //var y = childrenProjections[0];
+            //var z = childrenOpacity[0];
+
+            //for (int i = 0; i < childrenProjections.Length - 1; ++i)
+            //{
+            //    childrenLocations[i] = childrenLocations[i + 1];
+            //    childrenProjections[i] = childrenProjections[i + 1];
+            //    childrenOpacity[i] = childrenOpacity[i + 1];
+            //}
+
+            //childrenLocations[childrenLocations.Length - 1] = x;
+            //childrenProjections[childrenProjections.Length - 1] = y;
+            //childrenOpacity[childrenOpacity.Length - 1] = z;
+
+            //childrenProjectionsList.Add(childrenProjections.ToArray());
+            //childrenLocationsList.Add(childrenLocations.ToArray());
+            //childrenOpacityList.Add(childrenOpacity.ToArray());
 
             //ArrangeOverride(DesiredSize);
-            Animate(rorateDuration, 10);
+            Animate(rorateDuration, 1, true);
         }
 
         public void RotateToItem(object item)
@@ -209,16 +253,24 @@ namespace TestControls.Controls.Panels
 
             var index = children.IndexOf(children.FirstOrDefault(x => (x?.DataContext.Equals(item)).Value));
 
-            prevChildrenProjections = childrenProjections.ToArray();
-            prevChildrenLocations = childrenLocations.ToArray();
-            prevChildrenOpacity = childrenOpacity.ToArray();
+            //prevChildrenProjections = childrenProjections.ToArray();
+            //prevChildrenLocations = childrenLocations.ToArray();
+            //prevChildrenOpacity = childrenOpacity.ToArray();
 
             //OffsetChildrenLocations(index);
             //OffsetChildrenProjections(index);
             //OffsetChildrenOpacity(index);
 
             //ArrangeOverride(DesiredSize);
-            Animate(rorateToItemDuration, 15);
+
+            childrenLocationsList.Clear();
+            childrenProjectionsList.Clear();
+            childrenOpacityList.Clear();
+            prevChildrenLocationsList.Clear();
+            prevChildrenProjectionsList.Clear();
+            prevChildrenOpacityList.Clear();
+
+            Animate(rorateToItemDuration, 10, true);
         }
 
         #endregion
@@ -338,7 +390,7 @@ namespace TestControls.Controls.Panels
         {
             var opacity = 1.0;
             var n = childrenLocations.Length;
-            var offset = 0.9 / (n / 2);
+            var offset = 0.99 / (n / 2);
             childrenOpacity = new double[n];
 
             for (int i = 0; i < n; ++i)
@@ -359,90 +411,348 @@ namespace TestControls.Controls.Panels
             }
         }
 
-        private async void Animate(Duration duration, int count)
+        private async void Animate(Duration duration, int count, bool rotateRight)
         {
-            if (prevChildrenOpacity == null || prevChildrenProjections == null || prevChildrenLocations == null) return;
+            //if (prevChildrenOpacity == null || prevChildrenProjections == null || prevChildrenLocations == null) return;
 
-            _storyboard.Stop();
-            _storyboard.Children.Clear();
-            count = 5;
-            _storyboards = new Storyboard[count];
             var translate = new TranslateTransform();
+
+            //_storyboard.Stop();
+            //_storyboard.Children.Clear();
+
+            _storyboards = new Storyboard[count];
+
+            var doubleAnimationUsingKeyFrames = new DoubleAnimationUsingKeyFrames();
+            var easingDoubleKeyFrame = new EasingDoubleKeyFrame();
+
+            var opacityAnimation0 = new DoubleAnimation();
+            var projectionAnimation0 = new DoubleAnimation();
+            var xAnimation0 = new DoubleAnimation();
+            var yAnimation0 = new DoubleAnimation();
 
             for (int j = 0; j < count; ++j)
             {
                 _storyboards[j] = new Storyboard();
-                //_storyboards[j].BeginTime = new TimeSpan(0, 0, 0, 0, duration.TimeSpan.Milliseconds * j);
+                _storyboards[j].BeginTime = new TimeSpan(0, 0, 0, 0, duration.TimeSpan.Milliseconds * j);
 
-                prevChildrenProjections = childrenProjections.ToArray();
-                prevChildrenLocations = childrenLocations.ToArray();
-                prevChildrenOpacity = childrenOpacity.ToArray();
+                if (rotateRight)
+                    RightOffset();
+                else
+                    LeftOffset();
+            }
 
-                var x0 = childrenLocations[childrenLocations.Length - 1];
-                var y0 = childrenProjections[childrenProjections.Length - 1];
-                var z0 = childrenOpacity[childrenOpacity.Length - 1];
-
-                for (int q = childrenOpacity.Length - 1; q > 0; --q)
-                {
-                    childrenLocations[q] = childrenLocations[q - 1];
-                    childrenProjections[q] = childrenProjections[q - 1];
-                    childrenOpacity[q] = childrenOpacity[q - 1];
-                }
-
-                childrenLocations[0] = x0;
-                childrenProjections[0] = y0;
-                childrenOpacity[0] = z0;
-
+            for (int j = 0; j < count; ++j)
+            {
                 for (int i = 0; i < Children.Count; ++i)
                 {
-                    var opacityAnimation0 = new DoubleAnimation() { From = prevChildrenOpacity[i], To = childrenOpacity[i], Duration = duration };
-                    Storyboard.SetTarget(opacityAnimation0, Children[i]);
-                    Storyboard.SetTargetProperty(opacityAnimation0, nameof(UIElement.Opacity));
+                    //opacityAnimation0 = new DoubleAnimation() { From = prevChildrenOpacity[i], To = childrenOpacity[i], Duration = duration };
+                    //Storyboard.SetTarget(opacityAnimation0, Children[i]);
+                    //Storyboard.SetTargetProperty(opacityAnimation0, nameof(UIElement.Opacity));
 
-                    var projectionAnimation0 = new DoubleAnimation() { From = prevChildrenProjections[i].LocalOffsetZ, To = childrenProjections[i].LocalOffsetZ, Duration = duration };
-                    Storyboard.SetTarget(projectionAnimation0, Children[i]);
-                    Storyboard.SetTargetProperty(projectionAnimation0, new PropertyPath("UIElement.Projection.LocalOffsetZ").Path);
+                    //projectionAnimation0 = new DoubleAnimation() { From = prevChildrenProjections[i].LocalOffsetZ, To = childrenProjections[i].LocalOffsetZ, Duration = duration };
+                    //Storyboard.SetTarget(projectionAnimation0, Children[i]);
+                    //Storyboard.SetTargetProperty(projectionAnimation0, new PropertyPath("UIElement.Projection.LocalOffsetZ").Path);
 
                     Children[i].RenderTransform = translate;
 
-                    var xAnimation0 = new DoubleAnimation() { From = 0, To = childrenLocations[i].X - prevChildrenLocations[i].X, Duration = duration };
-                    Storyboard.SetTarget(xAnimation0, Children[i]);
-                    Storyboard.SetTargetProperty(xAnimation0, "(UIElement.RenderTransform).(TranslateTransform.X)");
+                    //xAnimation0 = new DoubleAnimation() { EnableDependentAnimation = true, From = 0, To = childrenLocations[i].X - prevChildrenLocations[i].X, Duration = duration };
+                    //Storyboard.SetTarget(xAnimation0, Children[i]);
+                    //Storyboard.SetTargetProperty(xAnimation0, "(UIElement.RenderTransform).(TranslateTransform.X)");
 
-                    var yAnimation0 = new DoubleAnimation() { From = 0, To = childrenLocations[i].Y - prevChildrenLocations[i].Y, Duration = duration };
-                    Storyboard.SetTarget(yAnimation0, Children[i]);
-                    Storyboard.SetTargetProperty(yAnimation0, "(UIElement.RenderTransform).(TranslateTransform.Y)");
+                    //yAnimation0 = new DoubleAnimation() { EnableDependentAnimation = true, From = 0, To = childrenLocations[i].Y - prevChildrenLocations[i].Y, Duration = duration };
+                    //Storyboard.SetTarget(yAnimation0, Children[i]);
+                    //Storyboard.SetTargetProperty(yAnimation0, "(UIElement.RenderTransform).(TranslateTransform.Y)");
 
-                    Canvas.SetZIndex(Children[i], (int)childrenProjections[i].LocalOffsetZ);
+                    //Storyboard.SetTarget(yAnimation0, Children[i]);
 
-                    _storyboards[j].Children.Add(opacityAnimation0);
-                    _storyboards[j].Children.Add(projectionAnimation0);
-                    _storyboards[j].Children.Add(xAnimation0);
-                    _storyboards[j].Children.Add(yAnimation0);
-                    _storyboards[j].Completed += (s, e) =>
+                    //_storyboards[j].Children.Add(opacityAnimation0);
+                    //_storyboards[j].Children.Add(projectionAnimation0);
+                    //_storyboards[j].Children.Add(xAnimation0);
+                    //_storyboards[j].Children.Add(yAnimation0);
+
+
+
+                    //doubleAnimationUsingKeyFrames = new DoubleAnimationUsingKeyFrames();
+                    //Storyboard.SetTarget(doubleAnimationUsingKeyFrames, Children[i]);
+                    //Storyboard.SetTargetProperty(doubleAnimationUsingKeyFrames, "(UIElement.Opacity)");
+
+                    //easingDoubleKeyFrame = new EasingDoubleKeyFrame();
+                    //easingDoubleKeyFrame.KeyTime = KeyTime.FromTimeSpan(new TimeSpan(0, 0, 0, 0, 0));
+                    //easingDoubleKeyFrame.Value = prevChildrenOpacity[i];
+                    //doubleAnimationUsingKeyFrames.KeyFrames.Add(easingDoubleKeyFrame);
+
+                    //easingDoubleKeyFrame = new EasingDoubleKeyFrame();
+                    //easingDoubleKeyFrame.KeyTime = KeyTime.FromTimeSpan(duration.TimeSpan);
+                    //easingDoubleKeyFrame.Value = childrenOpacity[i];
+                    //doubleAnimationUsingKeyFrames.KeyFrames.Add(easingDoubleKeyFrame);
+
+                    //_storyboards[j].Children.Add(doubleAnimationUsingKeyFrames);
+
+
+                    //doubleAnimationUsingKeyFrames = new DoubleAnimationUsingKeyFrames();
+                    //Storyboard.SetTarget(doubleAnimationUsingKeyFrames, Children[i]);
+                    //Storyboard.SetTargetProperty(doubleAnimationUsingKeyFrames, new PropertyPath("UIElement.Projection.LocalOffsetZ").Path);
+
+                    //easingDoubleKeyFrame = new EasingDoubleKeyFrame();
+                    //easingDoubleKeyFrame.KeyTime = KeyTime.FromTimeSpan(new TimeSpan());
+                    //easingDoubleKeyFrame.Value = prevChildrenProjections[i].LocalOffsetZ;
+                    //doubleAnimationUsingKeyFrames.KeyFrames.Add(easingDoubleKeyFrame);
+
+                    //easingDoubleKeyFrame = new EasingDoubleKeyFrame();
+                    //easingDoubleKeyFrame.KeyTime = KeyTime.FromTimeSpan(duration.TimeSpan);
+                    //easingDoubleKeyFrame.Value = childrenProjections[i].LocalOffsetZ;
+                    //doubleAnimationUsingKeyFrames.KeyFrames.Add(easingDoubleKeyFrame);
+
+                    //_storyboards[j].Children.Add(doubleAnimationUsingKeyFrames);
+
+                    doubleAnimationUsingKeyFrames = new DoubleAnimationUsingKeyFrames();
+                    Storyboard.SetTarget(doubleAnimationUsingKeyFrames, Children[i]);
+                    Storyboard.SetTargetProperty(doubleAnimationUsingKeyFrames, "(UIElement.Opacity)");
+
+                    //for (int q = 0; q < count; ++q)
                     {
-                        //var story = s as Storyboard;
-                        //if (story != null)
-                        //{
-                        //    story.Stop();
-                        //    story.Children.Clear();
-                        //    story = null;
-                        //}
-                        ArrangeOverride(DesiredSize);
-                    };
+
+                        easingDoubleKeyFrame = new EasingDoubleKeyFrame();
+                        easingDoubleKeyFrame.KeyTime = KeyTime.FromTimeSpan(new TimeSpan());
+                        easingDoubleKeyFrame.Value = prevChildrenOpacityList[j][i];
+                        doubleAnimationUsingKeyFrames.KeyFrames.Add(easingDoubleKeyFrame);
+
+                        easingDoubleKeyFrame = new EasingDoubleKeyFrame();
+                        easingDoubleKeyFrame.KeyTime = KeyTime.FromTimeSpan(duration.TimeSpan);
+                        easingDoubleKeyFrame.Value = childrenOpacityList[j][i];
+                        doubleAnimationUsingKeyFrames.KeyFrames.Add(easingDoubleKeyFrame);
+
+                    }
+                    _storyboards[j].Children.Add(doubleAnimationUsingKeyFrames);
+
+                    doubleAnimationUsingKeyFrames = new DoubleAnimationUsingKeyFrames();
+                    Storyboard.SetTarget(doubleAnimationUsingKeyFrames, Children[i]);
+                    Storyboard.SetTargetProperty(doubleAnimationUsingKeyFrames, new PropertyPath("UIElement.Projection.LocalOffsetZ").Path);
+
+                    //for (int q = 0; q < count; ++q)
+                    {
+
+                        easingDoubleKeyFrame = new EasingDoubleKeyFrame();
+                        easingDoubleKeyFrame.KeyTime = KeyTime.FromTimeSpan(new TimeSpan());
+                        easingDoubleKeyFrame.Value = prevChildrenProjectionsList[j][i].LocalOffsetZ;
+                        doubleAnimationUsingKeyFrames.KeyFrames.Add(easingDoubleKeyFrame);
+
+                        easingDoubleKeyFrame = new EasingDoubleKeyFrame();
+                        easingDoubleKeyFrame.KeyTime = KeyTime.FromTimeSpan(duration.TimeSpan);
+                        easingDoubleKeyFrame.Value = childrenProjectionsList[j][i].LocalOffsetZ;
+                        doubleAnimationUsingKeyFrames.KeyFrames.Add(easingDoubleKeyFrame);
+
+                    }
+                    _storyboards[j].Children.Add(doubleAnimationUsingKeyFrames);
+
+                    doubleAnimationUsingKeyFrames = new DoubleAnimationUsingKeyFrames();
+                    Storyboard.SetTarget(doubleAnimationUsingKeyFrames, Children[i]);
+                    Storyboard.SetTargetProperty(doubleAnimationUsingKeyFrames, "(UIElement.RenderTransform).(TranslateTransform.X)");
+
+                    //for (int q = 0; q < count; ++q)
+                    {
+
+                        easingDoubleKeyFrame = new EasingDoubleKeyFrame();
+                        easingDoubleKeyFrame.KeyTime = KeyTime.FromTimeSpan(new TimeSpan());
+                        easingDoubleKeyFrame.Value = 0;
+                        doubleAnimationUsingKeyFrames.KeyFrames.Add(easingDoubleKeyFrame);
+
+                        easingDoubleKeyFrame = new EasingDoubleKeyFrame();
+                        easingDoubleKeyFrame.KeyTime = KeyTime.FromTimeSpan(duration.TimeSpan);
+                        easingDoubleKeyFrame.Value = childrenLocationsList[j][i].X - prevChildrenLocationsList[j][i].X;
+                        doubleAnimationUsingKeyFrames.KeyFrames.Add(easingDoubleKeyFrame);
+
+                    }
+                    _storyboards[j].Children.Add(doubleAnimationUsingKeyFrames);
+
+                    doubleAnimationUsingKeyFrames = new DoubleAnimationUsingKeyFrames();
+                    Storyboard.SetTarget(doubleAnimationUsingKeyFrames, Children[i]);
+                    Storyboard.SetTargetProperty(doubleAnimationUsingKeyFrames, "(UIElement.RenderTransform).(TranslateTransform.Y)");
+
+                    //for (int q = 0; q < count; ++q)
+                    {
+
+                        easingDoubleKeyFrame = new EasingDoubleKeyFrame();
+                        easingDoubleKeyFrame.KeyTime = KeyTime.FromTimeSpan(new TimeSpan());
+                        easingDoubleKeyFrame.Value =  0;
+                        doubleAnimationUsingKeyFrames.KeyFrames.Add(easingDoubleKeyFrame);
+
+                        easingDoubleKeyFrame = new EasingDoubleKeyFrame();
+                        easingDoubleKeyFrame.KeyTime = KeyTime.FromTimeSpan(duration.TimeSpan);
+                        easingDoubleKeyFrame.Value = childrenLocationsList[j][i].Y - prevChildrenLocationsList[j][i].Y;
+                        doubleAnimationUsingKeyFrames.KeyFrames.Add(easingDoubleKeyFrame);
+
+                    }
+                    _storyboards[j].Children.Add(doubleAnimationUsingKeyFrames);
+
+
+
+
+
+
+                    //Canvas.SetZIndex(Children[i], (int)childrenProjections[i].LocalOffsetZ);
+
+                    //_storyboards[j].Children.Add(opacityAnimation0);
+                    //_storyboards[j].Children.Add(projectionAnimation0);
+                    //_storyboards[j].Children.Add(xAnimation0);
+                    //_storyboards[j].Children.Add(yAnimation0);
+                    //_storyboards[j].Completed += (s, e) =>
+                    //{
+                    //    //var story = s as Storyboard;
+                    //    //if (story != null)
+                    //    //{
+                    //    //    story.Stop();
+                    //    //    story.Children.Clear();
+                    //    //    story = null;
+                    //    //}
+                    //    //ArrangeOverride(DesiredSize);
+                    //    for (int k = 0; k < Children.Count; ++k)
+                    //    {
+                    //        //Children[i].Opacity = childrenOpacity[i];
+                    //        //Children[i].Projection = childrenProjections[i];
+                    //        Children[k].Arrange(childrenLocations[k]);
+                    //        //Canvas.SetZIndex(Children[i], (int)childrenProjections[i].LocalOffsetZ);
+                    //    }
+                    //};
                 }
             }
+
+            int t = 0;
+            //for (int i = 0; i < 1; ++i)
+            //{
+            //    _storyboards[t].Completed += (s, e) =>
+            //    {
+            //        _storyboards[t].Stop();
+            //        _storyboards[t].Children.Clear();
+            //        _storyboards[t] = null;
+
+            //        for (int k = 0; k < Children.Count; ++k)
+            //        {
+            //            Canvas.SetZIndex(Children[k], (int)childrenProjectionsList[count - 1][k].LocalOffsetZ);
+            //            Children[k].Arrange(childrenLocationsList[count - 1][k]);
+            //            Children[k].Opacity = childrenOpacityList[count - 1][k];
+            //            Children[k].Projection = childrenProjectionsList[count - 1][k];
+            //        }
+
+            //        if (t++ < 1 - 1)
+            //        {
+            //            //if (rotateRight)
+            //            //    RightOffset();
+            //            //else
+            //            //    LeftOffset();
+
+            //            //for (int k = 0; k < Children.Count; ++k)
+            //            //{
+            //            //    opacityAnimation0 = new DoubleAnimation() { From = prevChildrenOpacityList[t][k], To = childrenOpacityList[t][k], Duration = duration };
+            //            //    Storyboard.SetTarget(opacityAnimation0, Children[k]);
+            //            //    Storyboard.SetTargetProperty(opacityAnimation0, nameof(UIElement.Opacity));
+
+            //            //    projectionAnimation0 = new DoubleAnimation() { From = prevChildrenProjectionsList[t][k].LocalOffsetZ, To = childrenProjectionsList[t][k].LocalOffsetZ, Duration = duration };
+            //            //    Storyboard.SetTarget(projectionAnimation0, Children[k]);
+            //            //    Storyboard.SetTargetProperty(projectionAnimation0, new PropertyPath("UIElement.Projection.LocalOffsetZ").Path);
+
+            //            //    Children[k].RenderTransform = translate;
+
+            //            //    xAnimation0 = new DoubleAnimation() { EnableDependentAnimation = true, From = 0, To = childrenLocationsList[t][k].X - prevChildrenLocationsList[t][k].X, Duration = duration };
+            //            //    Storyboard.SetTarget(xAnimation0, Children[k]);
+            //            //    Storyboard.SetTargetProperty(xAnimation0, "(UIElement.RenderTransform).(TranslateTransform.X)");
+
+            //            //    yAnimation0 = new DoubleAnimation() { EnableDependentAnimation = true, From = 0, To = childrenLocationsList[t][k].Y - prevChildrenLocationsList[t][k].Y, Duration = duration };
+            //            //    Storyboard.SetTarget(yAnimation0, Children[k]);
+            //            //    Storyboard.SetTargetProperty(yAnimation0, "(UIElement.RenderTransform).(TranslateTransform.Y)");
+
+            //            //    Storyboard.SetTarget(yAnimation0, Children[k]);
+            //            //}
+
+            //            //_storyboards[t] = new Storyboard();
+            //            //_storyboards[t].Children.Add(opacityAnimation0);
+            //            //_storyboards[t].Children.Add(projectionAnimation0);
+            //            //_storyboards[t].Children.Add(xAnimation0);
+            //            //_storyboards[t].Children.Add(yAnimation0);
+            //            _storyboards[t].Begin();
+            //        }
+            //    };
+            //    //_storyboards[i].Begin();
+            //    //await Task.Delay(duration.TimeSpan.Milliseconds);
+            //}
+            //t = 0;
+
+
             for (int j = 0; j < count; ++j)
-            {
                 _storyboards[j].Begin();
-                await Task.Delay(duration.TimeSpan.Milliseconds);
-            }
+
+
             //_storyboard.Completed += (s, e) =>
             //{
             //    _storyboard.Stop();
             //    //ArrangeOverride(DesiredSize);
             //};
             //_storyboard.Begin();
+        }
+
+        public void RightOffset()
+        {
+            if (!Children.Any()) return;
+
+            prevChildrenProjections = childrenProjections.ToArray();
+            prevChildrenLocations = childrenLocations.ToArray();
+            prevChildrenOpacity = childrenOpacity.ToArray();
+
+            prevChildrenProjectionsList.Add(prevChildrenProjections.ToArray());
+            prevChildrenLocationsList.Add(prevChildrenLocations.ToArray());
+            prevChildrenOpacityList.Add(prevChildrenOpacity.ToArray());
+
+            var x0 = childrenLocations[childrenLocations.Length - 1];
+            var y0 = childrenProjections[childrenProjections.Length - 1];
+            var z0 = childrenOpacity[childrenOpacity.Length - 1];
+
+            for (int q = childrenOpacity.Length - 1; q > 0; --q)
+            {
+                childrenLocations[q] = childrenLocations[q - 1];
+                childrenProjections[q] = childrenProjections[q - 1];
+                childrenOpacity[q] = childrenOpacity[q - 1];
+            }
+
+            childrenLocations[0] = x0;
+            childrenProjections[0] = y0;
+            childrenOpacity[0] = z0;
+
+            childrenProjectionsList.Add(childrenProjections.ToArray());
+            childrenLocationsList.Add(childrenLocations.ToArray());
+            childrenOpacityList.Add(childrenOpacity.ToArray());
+        }
+
+
+        public void LeftOffset()
+        {
+            if (!Children.Any()) return;
+
+            prevChildrenProjections = childrenProjections.ToArray();
+            prevChildrenLocations = childrenLocations.ToArray();
+            prevChildrenOpacity = childrenOpacity.ToArray();
+
+            prevChildrenProjectionsList.Add(prevChildrenProjections.ToArray());
+            prevChildrenLocationsList.Add(prevChildrenLocations.ToArray());
+            prevChildrenOpacityList.Add(prevChildrenOpacity.ToArray());
+
+            var x = childrenLocations[0];
+            var y = childrenProjections[0];
+            var z = childrenOpacity[0];
+
+            for (int i = 0; i < childrenProjections.Length - 1; ++i)
+            {
+                childrenLocations[i] = childrenLocations[i + 1];
+                childrenProjections[i] = childrenProjections[i + 1];
+                childrenOpacity[i] = childrenOpacity[i + 1];
+            }
+
+            childrenLocations[childrenLocations.Length - 1] = x;
+            childrenProjections[childrenProjections.Length - 1] = y;
+            childrenOpacity[childrenOpacity.Length - 1] = z;
+
+            childrenProjectionsList.Add(childrenProjections.ToArray());
+            childrenLocationsList.Add(childrenLocations.ToArray());
+            childrenOpacityList.Add(childrenOpacity.ToArray());
         }
 
         #endregion

@@ -22,19 +22,21 @@
 
             <Button Content="Left" Tapped="LeftButton_Tapped" Grid.Column="0"/>
 
-            <ItemsControl x:Name="ItemsControl" Grid.Column="1" ItemsSource="{Binding ElementName=Root, Path=ItemsSource, Mode=TwoWay}">
+            <ItemsControl x:Name="ItemsControl" Grid.Column="1" ItemsSource="{Binding ElementName=Root, Path=ItemsSource, Mode=TwoWay}"
+                          VerticalContentAlignment="Center" HorizontalContentAlignment="Center">
                 <ItemsControl.ItemsPanel>
                     <ItemsPanelTemplate>
                         <panels:Carousel Tapped="Carousel_Tapped" 
-                                         Background="LightGray"
-                                         Offset="40"
-                                         EllipseWidth="800"
-                                         EllipseHeight="200" />
+                                         VerticalAlignment="Top"
+                                         HorizontalAlignment="Center"
+                                         Offset="50"
+                                         EllipseWidth="1600"
+                                         EllipseHeight="250" />
                     </ItemsPanelTemplate>
                 </ItemsControl.ItemsPanel>
                 <ItemsControl.ItemTemplate>
                     <DataTemplate>
-                        <Grid Height="50" Width="100" Background="Gray">
+                        <Grid Height="200" Width="200" Background="Gray">
                             <Border BorderBrush="Red" BorderThickness="2"/>
                             <TextBlock Text="{Binding}"/>
                         </Grid>
