@@ -212,6 +212,9 @@ namespace TestControls.Controls.Panels
             var currentIndex = SelectedItem == null ? 0 : children.IndexOf(children.FirstOrDefault(x => (x?.DataContext.Equals(SelectedItem)).Value));
             SelectedItem = item;
 
+            index++;
+            currentIndex++;
+
             childrenLocationsList.Clear();
             childrenProjectionsList.Clear();
             childrenOpacityList.Clear();
@@ -338,7 +341,7 @@ namespace TestControls.Controls.Panels
         {
             var opacity = 1.0;
             var n = childrenLocations.Length;
-            var offset = 0.9 / (n / 2);
+            var offset = 0.5 / (n / 2);
             childrenOpacity = new double[n];
 
             for (int i = 0; i < n; ++i)
@@ -361,23 +364,23 @@ namespace TestControls.Controls.Panels
 
         private void Animate(Duration duration, int count, bool rotateRight)
         {
-            var translate = new TranslateTransform();
-
-            _storyboards = new Storyboard[count];
-
             DoubleAnimation opacityAnimation;
             DoubleAnimation projectionAnimation;
             DoubleAnimation xAnimation;
             DoubleAnimation yAnimation;
 
+            _storyboards = new Storyboard[count];
+
+            var translate = new TranslateTransform();
+
             for (int j = 0; j < count; ++j)
             {
+                _storyboards[j] = new Storyboard();
+
                 if (rotateRight)
                     RightOffset();
                 else
                     LeftOffset();
-
-                _storyboards[j] = new Storyboard();
 
                 for (int i = 0; i < Children.Count; ++i)
                 {
@@ -401,7 +404,7 @@ namespace TestControls.Controls.Panels
 
                     Storyboard.SetTarget(yAnimation, Children[i]);
 
-                    _storyboards[j].FillBehavior = FillBehavior.Stop;
+                    _storyboards[j].FillBehavior = FillBehavior.HoldEnd;
 
                     _storyboards[j].Children.Add(opacityAnimation);
                     _storyboards[j].Children.Add(projectionAnimation);
@@ -410,30 +413,32 @@ namespace TestControls.Controls.Panels
                 }
             }
 
-            int t = 0;
+            var t = 0;
             for (int i = 0; i < count; ++i)
             {
                 _storyboards[i].Completed += (s, e) =>
-                 {
-                     try
-                     {
-                         for (int k = 0; k < Children.Count; ++k)
-                         {
-                             Canvas.SetZIndex(Children[k], (int)childrenProjectionsList[t][k].LocalOffsetZ);
-                             Children[k].Arrange(childrenLocationsList[t][k]);
-                             Children[k].Opacity = childrenOpacityList[t][k];
-                             Children[k].Projection = childrenProjectionsList[t][k];
-                         }
+                {
+                    try
+                    {
+                        for (int k = 0; k < Children.Count; ++k)
+                        {
+                            Children[k].Arrange(childrenLocationsList[t][k]);
+                            Children[k].Opacity = childrenOpacityList[t][k];
+                            Children[k].Projection = childrenProjectionsList[t][k];
+                        }
+                        _storyboards[t].Stop();
 
-                         if (t < count - 1)
-                             _storyboards[++t].Begin();
-                     }
-                     catch { }
-                 };
+                        for (int k = 0; k < Children.Count; ++k)
+                            Canvas.SetZIndex(Children[k], (int)childrenProjectionsList[t][k].LocalOffsetZ);
+
+                        if (t < count - 1)
+                            _storyboards[++t].Begin();
+                    }
+                    catch { }
+                };
             }
 
             _storyboards[0].Begin();
-
         }
 
         public void RightOffset()

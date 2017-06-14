@@ -34,9 +34,9 @@
                 </ItemsControl.ItemsPanel>
                 <ItemsControl.ItemTemplate>
                     <DataTemplate>
-                        <Grid Height="300" Width="400" Background="Gray">
+                        <Grid Height="300" Width="400" Background="Black">
                             <Border BorderBrush="Red" BorderThickness="2"/>
-                            <TextBlock Text="{Binding}"/>
+                            <TextBlock Text="{Binding}" Foreground="White" Margin="5"/>
                         </Grid>
                     </DataTemplate>
                 </ItemsControl.ItemTemplate>
